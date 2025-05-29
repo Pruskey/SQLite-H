@@ -4,6 +4,7 @@ const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { validarCookie } = require('./middlewares.js')
 const cookie_parser = require('cookie-parser')
+require('dot-env').config()
 
 let db = null
 
@@ -75,7 +76,7 @@ server.post('/login', async (req, res) => {
             //corpo do token
             resultado,
             //chave de criptografia
-            "CHAVESEGURA",
+            process.env.SENHAJWT,
             //tempo de expiração
             {expiresIn: 1000 * 60 * 60 * 24}
         )
