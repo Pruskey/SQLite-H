@@ -4,7 +4,7 @@ const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { validarCookie } = require('./middlewares.js')
 const cookie_parser = require('cookie-parser')
-require('dot-env').config()
+require('dotenv').config()
 
 let db = null
 
@@ -15,7 +15,7 @@ server.use(cookie_parser())
 
 server.get('/usuarios', validarCookie, async (req, res) =>{
     const sql = `SELECT * FROM usuarios`
-    const dados = db.all(sql)
+    const dados = await db.all(sql)
     console.log(dados)
     res.status(200).send(dados)
 })
@@ -33,7 +33,7 @@ server.get('/usuarios/:id', validarCookie, async (req, res) => {
 
 server.post('/usuarios', validarCookie, async (req, res) =>{
     const {nome, cpf, email, senha} = req.body
-    const sql = `SECT nome FROM usuarios WHERE cpf = ? OR email = ?`
+    const sql = `SELECT nome FROM usuarios WHERE cpf = ? OR email = ?`
     const valores = [cpf, email]
     const resultado = await db.get(sql, valores)
     if(resultado){
@@ -72,13 +72,13 @@ server.post('/login', async (req, res) => {
             return
         }
         //criar o Token
-        jwt.sign(
+        const token = jwt.sign(
             //corpo do token
             resultado,
             //chave de criptografia
             process.env.SENHAJWT,
             //tempo de expiração
-            {expiresIn: 1000 * 60 * 60 * 24}
+            {expiresIn: '1d'}
         )
         res.status(200).json({msg:token})
 
