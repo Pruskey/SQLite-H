@@ -2,21 +2,24 @@ const express = require ('express')
 const { conectar } = require('./bd.js')
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const { validarCookie } = require('./middlewares.js')
+const cookie_parser = require('cookie-parser')
 
 let db = null
 
 const server = express()
 
 server.use(express.json())
+server.use(cookie_parser())
 
-server.get('/usuarios', async (req, res) =>{
+server.get('/usuarios', validarCookie, async (req, res) =>{
     const sql = `SELECT * FROM usuarios`
     const dados = db.all(sql)
     console.log(dados)
     res.status(200).send(dados)
 })
 
-server.get('/usuarios/:id', async (req, res) => {
+server.get('/usuarios/:id', validarCookie, async (req, res) => {
     const id = req.params.id
     const sql = `SELECT * FROM usuarios WHERE id = ?`
     const dados = await db.get(sql, [id])
@@ -27,7 +30,7 @@ server.get('/usuarios/:id', async (req, res) => {
     res.status(200).json(dados)
 })
 
-server.post('/usuarios', async (req, res) =>{
+server.post('/usuarios', validarCookie, async (req, res) =>{
     const {nome, cpf, email, senha} = req.body
     const sql = `SECT nome FROM usuarios WHERE cpf = ? OR email = ?`
     const valores = [cpf, email]
